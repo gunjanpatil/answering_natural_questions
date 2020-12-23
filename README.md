@@ -1,5 +1,8 @@
-# answering_natural_questions
+[![CodeFactor](https://www.codefactor.io/repository/github/gunjanpatil/answering_natural_questions/badge?s=d7ff811865d408f8f0322e6a2b217755d971a604)](https://www.codefactor.io/repository/github/gunjanpatil/answering_natural_questions)
+# Answering Natural Questions
 cortx challenge answering natural questions
+
+This project looks at how to finetune pretrained hugging face transfromers to anwer questions based on wiki pages. 
 
 ## things planned
 #### verion 0: Simple pipeline
