@@ -67,7 +67,7 @@ class NaturalQuestions(datasets.BeamBasedBuilder):
 
     VERSION = datasets.Version("0.0.5")
     SUPPORTED_VERSIONS = [datasets.Version("0.0.1"),datasets.Version("0.0.2")]
-    print("Using custom version")
+    print("Using custom version for medium dataset")
 
     def _info(self):
         return datasets.DatasetInfo(

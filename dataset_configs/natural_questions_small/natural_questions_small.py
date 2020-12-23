@@ -65,9 +65,9 @@ _DOWNLOAD_URLS = {
 class NaturalQuestions(datasets.BeamBasedBuilder):
     """Natural Questions: A Benchmark for Question Answering Research."""
 
-    VERSION = datasets.Version("0.0.5")
-    SUPPORTED_VERSIONS = [datasets.Version("0.0.1"),datasets.Version("0.0.2")]
-    print("Using custom version")
+    VERSION = datasets.Version("0.0.4")
+    SUPPORTED_VERSIONS = [datasets.Version("0.0.1"), datasets.Version("0.0.2")]
+    print("Using custom version for small dataset")
 
     def _info(self):
         return datasets.DatasetInfo(

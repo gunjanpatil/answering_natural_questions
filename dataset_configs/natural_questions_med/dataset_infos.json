@@ -129,8 +129,8 @@
           }
       },
       "supervised_keys":null,
-      "builder_name":"natural_questions_small",
-      "config_name":"custom_small",
+      "builder_name":"natural_questions_med",
+      "config_name":"custom_med",
       "version":{
          "version_str":"0.0.5",
          "description":null,
@@ -144,13 +144,13 @@
             "name":"train",
             "num_bytes":97445142568,
             "num_examples":307373,
-            "dataset_name":"natural_questions_small"
+            "dataset_name":"natural_questions_med"
          },
          "validation":{
             "name":"validation",
             "num_bytes":2353975312,
             "num_examples":7830,
-            "dataset_name":"natural_questions_small"
+            "dataset_name":"natural_questions_med"
          }
       },
       "download_checksums":{

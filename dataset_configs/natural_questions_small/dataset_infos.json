@@ -132,12 +132,12 @@
       "builder_name":"natural_questions_small",
       "config_name":"custom_small",
       "version":{
-         "version_str":"0.0.5",
+         "version_str":"0.0.4",
          "description":null,
          "datasets_version_to_prepare":null,
          "major":0,
          "minor":0,
-         "patch":5
+         "patch":4
       },
       "splits":{
          "train":{
