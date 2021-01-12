@@ -1,6 +1,7 @@
 # custom project specific files
 *.arrow
 *.py.lock
+*.zip
 
 .idea
 
