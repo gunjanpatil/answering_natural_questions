@@ -1,0 +1,18 @@
+{
+  "model_name_or_path": "bert-base-uncased",
+  "datasets_path": "/home/ubuntu/datasets/natural_questions_simplified",
+  "project_path": "/home/ubuntu/answering_nq",
+  "simplified_train_dataset": "v1.0-simplified/simplified-nq-train.jsonl",
+  "simplified_val_dataset": "v1.0-simplified/nq-dev-all.jsonl",
+  "learning_rate": 3e-5,
+  "num_train_epochs": 2,
+  "max_seq_length": 384,
+  "max_question_length": 64,
+  "per_device_train_batch_size": 1,
+  "save_steps": 10000,
+  "fp16": false,
+  "fp16_opt_level": "O1",
+  "overwrite_output_dir": true,
+  "output_dir": "weights/train_for_hard_mining",
+  "seed": 42
+}
