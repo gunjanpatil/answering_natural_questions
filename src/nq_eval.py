@@ -101,7 +101,7 @@ import pickle
 from absl import app
 from absl import flags
 from absl import logging
-from src.utils import eval_utils as util
+from utils import eval_utils as util
 import six
 
 flags.DEFINE_string(
