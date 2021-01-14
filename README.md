@@ -9,15 +9,40 @@ When given a test example with document tokens, question text, and a list of lon
 The broad idea is to finetune pre-trained hugging face transformer-based question answering models to answer questions based on Wikipedia pages.
 
 #### Version 1: Uniform sampling
-- Idea: The model is trained using examples with a positive long-answer candidate and a uniformly sampled negative long-answer candidate from the positive examples. The idea is to make the model learn which candidates are correct predictions and which candidates are incorrect.
-- Model finetuned: bert-base-uncased
-- long-best-threshold-f1: 0.46
+- **Idea**: The model is trained using examples with a positive long-answer candidate and a uniformly sampled negative long-answer candidate from the positive examples. The idea is to make the model learn which candidates are correct predictions and which candidates are incorrect.
+- **Model finetuned**: bert-base-uncased
+- **long-best-threshold-f1**: 0.46
 
 #### Version 2: Better sampling
-- Idea: The reason behind a low f1 score would be that the negative long-answer candidate sampled might not be the most challenging candidate against the positive candidate.
+- **Idea**: The reason behind a low f1 score would be that the negative long-answer candidate sampled might not be the most challenging candidate against the positive candidate.
 Thus, the next step would be to sample a hard negative candidate from a distribution that tells us the probability of hardness of each candidate. To get this distribution, we can use the model trained in version 0 that gives us the probability score of a positive candidate to mine hard negative examples.
-- Model to be finetuned: deepset/bert-large-uncased-whole-word-masking-squad2
-- long-best-threshold-f1: pending
+- **Model to be finetuned**: deepset/bert-large-uncased-whole-word-masking-squad2
+- **long-best-threshold-f1**: pending
 
-## How to Run: 
-#### TBA
+---
+*System Requirements:*
+1. Works with Python3
+2. Distributed system(multiple GPUs) for training (Used lambda stack gpu cloud's 2x RTX 6000(24 GB) instance).
+3. Validation will work on a CUDA installed machine.
+
+*Major Packages Required*
+1. [transformers~=4.1.1](https://github.com/huggingface/transformers, "huggingface transformers github")
+2. torch~=1.7.1
+3. [datasets~=1.1.3](https://github.com/huggingface/datasets, "huggingface datasets github")
+4. torch~=1.7.1
+5. [apex](https://github.com/NVIDIA/apex#quick-start, "nvidia apex")
+
+#### How to run:
+1. Clone the repository  
+  ```git clone https://github.com/gunjanpatil/answering_natural_questions.git```
+2. To download, unzip and install all necessary packages,run setup.sh
+```bash setup.sh```
+3. Training:
+  a. To train a model with train_v1.py, first modify training configurations in configs/args.json file according to your requirements.
+    Mandatory modifications required are:
+      - *datasets_path*: path to the natural_questions_simplified folder where the simplifed datasets jsonl file will be stored after running setup.sh
+      - *project_path*: path to your repository
+    You can make changes to other arguments in the args file depending on your needs. You can also train using mixed precision by setting the fp16 argument to true.
+  b. To launch distributed training of a model using version 1, run the training script train_v1.py with a config file located in configs/args.json as follows:
+```python3 -m torch.distributed.launch --nproc_per_node=2 train_v1.py --configs=configs/args.json > train_v1_logs.txt```
+  The training configs used for this project are the same as the ones in configs/args.json. The weights are saved in the output_dir mentioned in the configs file.
