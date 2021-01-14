@@ -100,8 +100,7 @@ def parse_data_from_json_file(train_dataset: str, max_data: int = 1e10, shuffle:
 def main():
 
     # checking for system requirements
-    assert torch.cuda.is_available(), "system does not have multiple gpus to train"
-    assert torch.cuda.device_count() > 1, "system does not have multiple gpus to train"
+    assert torch.cuda.is_available(), "system does not have gpus to train"
 
     # Command line argument parser
     parser = argparse.ArgumentParser(description="arguments that can only be provided using command line")
