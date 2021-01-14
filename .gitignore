@@ -1,4 +1,6 @@
 # custom project specific files
+apex
+datasets
 *.arrow
 *.py.lock
 *.zip
