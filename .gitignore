@@ -1,4 +1,5 @@
 # custom project specific files
+weights
 apex
 datasets
 *.arrow
