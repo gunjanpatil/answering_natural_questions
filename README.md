@@ -27,11 +27,12 @@ Thus, the next step would be to sample a hard negative candidate from a distribu
 
 *Major Packages Required*
 1. [transformers~=4.1.1](https://github.com/huggingface/transformers, "huggingface transformers github")
-3. [datasets~=1.1.3](https://github.com/huggingface/datasets, "huggingface datasets github")
+2. [datasets~=1.1.3](https://github.com/huggingface/datasets, "huggingface datasets github")
+3. [apex](https://github.com/NVIDIA/apex#quick-start, "nvidia apex")
 4. torch~=1.7.1
-5. [apex](https://github.com/NVIDIA/apex#quick-start, "nvidia apex")
+---
 
-#### How to run:
+#### Installation and Run:
 1. **Clone** the repository  
   ```git clone https://github.com/gunjanpatil/answering_natural_questions.git```
   
