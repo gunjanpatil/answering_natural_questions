@@ -100,7 +100,7 @@ if __name__=='__main__':
     args = parser.parse_args()
 
     logging.info("parsing validation dataset")
-    id_list, id_candidate_list_sorted, data_dict = parse_data_from_json_file(args.val_dataset, 10)
+    id_list, id_candidate_list_sorted, data_dict = parse_data_from_json_file(args.val_dataset)
 
     # hyperparameters
     max_seq_length = 384
