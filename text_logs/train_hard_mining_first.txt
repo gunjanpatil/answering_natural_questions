@@ -1,0 +1,91 @@
+*****************************************
+Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+*****************************************
+2021-01-11 18:46:09.879223: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcudart
+.so.10.2
+2021-01-11 18:46:09.879223: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcudart
+.so.10.2
+2021-01-11 18:46:09.882517: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcudart
+.so.10.2
+2021-01-11 18:46:09.882517: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcudart
+.so.10.2
+11-Jan-21 18:46:11 - local rank: 1
+11-Jan-21 18:46:11 - local rank: 0
+11-Jan-21 18:46:11 - Number of Cuda Devices: 2
+11-Jan-21 18:46:11 - Setting up distributed training
+11-Jan-21 18:46:15 - Setting Seed. Input Seed: 42
+11-Jan-21 18:46:15 - Parsing Training Data examples
+11-Jan-21 18:46:15 - Parsing Training Data examples
+307373it [02:14, 2283.22it/s]
+306994it [02:14, 2318.97it/s]11-Jan-21 18:48:30 - Number of documents in training set: 152086
+307373it [02:14, 2280.26it/s]
+11-Jan-21 18:48:30 - Number of documents in training set: 152086
+11-Jan-21 18:48:30 - loading config from bert-base-uncased
+11-Jan-21 18:48:30 - Starting new HTTPS connection (1): huggingface.co:443
+11-Jan-21 18:48:30 - https://huggingface.co:443 "HEAD /bert-base-uncased/resolve/main/config.json HTTP/1.1" 200 0
+11-Jan-21 18:48:30 - loading tokenizer from bert-base-uncased
+11-Jan-21 18:48:30 - Starting new HTTPS connection (1): huggingface.co:443
+11-Jan-21 18:48:30 - https://huggingface.co:443 "HEAD /bert-base-uncased/resolve/main/vocab.txt HTTP/1.1" 200 0
+11-Jan-21 18:48:30 - loading model from bert-base-uncased
+11-Jan-21 18:48:30 - Starting new HTTPS connection (1): huggingface.co:443
+11-Jan-21 18:48:30 - https://huggingface.co:443 "HEAD /bert-base-uncased/resolve/main/pytorch_model.bin HTTP/1.1" 302 0
+Some weights of the model checkpoint at bert-base-uncased were not used when initializing BertForQuestionAnswering: ['cls.predictions.bia
+s', 'cls.predictions.transform.dense.weight', 'cls.predictions.transform.dense.bias', 'cls.predictions.decoder.weight', 'cls.seq_relation
+ship.weight', 'cls.seq_relationship.bias', 'cls.predictions.transform.LayerNorm.weight', 'cls.predictions.transform.LayerNorm.bias']
+- This IS expected if you are initializing BertForQuestionAnswering from the checkpoint of a model trained on another task or with anothe
+r architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
+- This IS NOT expected if you are initializing BertForQuestionAnswering from the checkpoint of a model that you expect to be exactly iden
+tical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+Some weights of BertForQuestionAnswering were not initialized from the model checkpoint at bert-base-uncased and are newly initialized: [
+'qa_outputs.weight', 'qa_outputs.bias', 'classifier.weight', 'classifier.bias']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+11-Jan-21 18:48:33 - loading config from bert-base-uncased
+11-Jan-21 18:48:33 - Starting new HTTPS connection (1): huggingface.co:443
+11-Jan-21 18:48:33 - initializing Adam optimizer with learning rate 3e-05
+11-Jan-21 18:48:33 - distributing model paralelly
+11-Jan-21 18:48:33 - https://huggingface.co:443 "HEAD /bert-base-uncased/resolve/main/config.json HTTP/1.1" 200 0
+11-Jan-21 18:48:33 - loading tokenizer from bert-base-uncased
+11-Jan-21 18:48:33 - Starting new HTTPS connection (1): huggingface.co:443
+11-Jan-21 18:48:34 - https://huggingface.co:443 "HEAD /bert-base-uncased/resolve/main/vocab.txt HTTP/1.1" 200 0
+11-Jan-21 18:48:34 - loading model from bert-base-uncased
+11-Jan-21 18:48:34 - Starting new HTTPS connection (1): huggingface.co:443
+11-Jan-21 18:48:34 - https://huggingface.co:443 "HEAD /bert-base-uncased/resolve/main/pytorch_model.bin HTTP/1.1" 302 0
+Some weights of the model checkpoint at bert-base-uncased were not used when initializing BertForQuestionAnswering: ['cls.predictions.bias', 'cls.predictions.transform.dense.weight', 'cls.predictions.transform.dense.bias', 'cls.predictions.decoder.weight', 'cls.seq_relationship.weight', 'cls.seq_relationship.bias', 'cls.predictions.transform.LayerNorm.weight', 'cls.predictions.transform.LayerNorm.bias']
+- This IS expected if you are initializing BertForQuestionAnswering from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
+- This IS NOT expected if you are initializing BertForQuestionAnswering from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+Some weights of BertForQuestionAnswering were not initialized from the model checkpoint at bert-base-uncased and are newly initialized: ['qa_outputs.weight', 'qa_outputs.bias', 'classifier.weight', 'classifier.bias']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+11-Jan-21 18:48:37 - initializing Adam optimizer with learning rate 3e-05
+11-Jan-21 18:48:37 - distributing model paralelly
+  0%|                                                                                                              | 0/2 [00:00<?, ?it/s]
+11-Jan-21 18:48:37 - training for epoch 0
+11-Jan-21 18:48:37 - Number of batches: 76043                                                                                            11-Jan-21 18:48:37 - epoch: 0,training info: ,start position loss: 5.60982084274292 ,end position loss: 6.015653610229492 ,classification loss: 2.373218536376953 ,start position accuracy: 0.0 ,end position accuracy: 0.0 ,classifier accuracy: 0.0
+
+11-Jan-21 18:48:37 - saving weights for step 0 to /home/ubuntu/answering_nq/weights/train_for_hard_mining/epoch_0 folder
+11-Jan-21 21:36:31 - epoch: 0,training info: ,start position loss: 0.6493497490882874 ,end position loss: 0.691085696220398 ,classification loss: 0.802505612373352 ,start position accuracy: 1.0 ,end position accuracy: 1.0 ,classifier accuracy: 0.5
+11-Jan-21 21:36:31 - saving weights for step 10000 to /home/ubuntu/answering_nq/weights/train_for_hard_mining/epoch_0 folder             12-Jan-21 00:18:11 - epoch: 0,training info: ,start position loss: 1.9118232727050781 ,end position loss: 0.06120092421770096 ,classification loss: 0.04699559509754181 ,start position accuracy: 0.0 ,end position accuracy: 1.0 ,classifier accuracy: 1.0
+
+12-Jan-21 00:18:11 - saving weights for step 20000 to /home/ubuntu/answering_nq/weights/train_for_hard_mining/epoch_0 folder             12-Jan-21 03:04:50 - epoch: 0,training info: ,start position loss: 0.22690491378307343 ,end position loss: 0.11032137274742126 ,classification loss: 0.08612871170043945 ,start position accuracy: 1.0 ,end position accuracy: 1.0 ,classifier accuracy: 1.0
+12-Jan-21 03:04:50 - saving weights for step 30000 to /home/ubuntu/answering_nq/weights/train_for_hard_mining/epoch_0 folder
+                                                                                                                                         12-Jan-21 05:53:22 - epoch: 0,training info: ,start position loss: 0.373447060585022 ,end position loss: 2.6313600540161133 ,classification loss: 0.09666983783245087 ,start position accuracy: 1.0 ,end position accuracy: 0.0 ,classifier accuracy: 1.0
+12-Jan-21 05:53:22 - saving weights for step 40000 to /home/ubuntu/answering_nq/weights/train_for_hard_mining/epoch_0 folder
+12-Jan-21 08:40:58 - epoch: 0,training info: ,start position loss: 0.33286064863204956 ,end position loss: 1.0505626201629639 ,classification loss: 0.35205990076065063 ,start position accuracy: 1.0 ,end position accuracy: 0.0 ,classifier accuracy: 1.0
+12-Jan-21 08:40:58 - saving weights for step 50000 to /home/ubuntu/answering_nq/weights/train_for_hard_mining/epoch_0 folder
+
+12-Jan-21 11:32:57 - epoch: 0,training info: ,start position loss: 0.0 ,end position loss: 0.0 ,classification loss: 0.9560183882713318 ,start position accuracy: 0.0 ,end position accuracy: 0.0 ,classifier accuracy: 0.5
+12-Jan-21 11:32:57 - saving weights for step 60000 to /home/ubuntu/answering_nq/weights/train_for_hard_mining/epoch_0 folder             ^[[A^[[A^[[A^[[A^[[B^[[B^[[B^[[B████████████████████████████████████████████▋                 | 61250/76043 [17:05:07<4:03:04,  1.01it/s]
+ 90%|████████████████████████████████████████████████████████████████████████████████▍        | 68779 90%|████████████████████████████████████████████████████████████████████████████████▍        | 68779 90%|████████████████████████████████████████████████████████████████████████████████▍        | 68780 90%|████████████████████████████████████████████████████████████████████████████████▍        | 68780 90%|████████████████████████████████████████████████████████████████████████████████▌        | 68781 90%|████████████████████████████████████████████████████████████████████████████████▌        | 68781 90%|████████████████████████████████████████████████████████████████████████████████▌        | 68782 90%|████████████████████████████████████████████████████████████████████████████████▌        | 68782 90%|████████████████████████████████████████████████████████████████████████████████▌        | 68783 90%|████████████████████████████████████████████████████████████████████████████████▌        | 68783 90%|████████████████████████████████████████████████████████████████████████████████▌        | 68784 90%|████████████████████████████████████████████████████████████████████████████████▌        | 68784 90%|████████████████████████████████████████████████████████████████████████████████▌        | 68785 90%|████████████████████████████████████████████████████████████████████████████████▌        | 68785 90%|████████████████████████████████████████████████████████████████████████████████▌        | 68786 90%|████████████████████████████████████████████████████████████████████████████████▌        | 68786 90%|████████████████████████████████████████████████████████████████████████████████▌        | 68787 90%|████████████████████████████████████████████████████████████████████████████████▌        | 68787 90%|████████████████████████████████████████████████████████████████████████████████▌        | 687812-Jan-21 14:21:33 - epoch: 0,training info: ,start position loss: 0.0 ,end position loss: 0.0 ,classification loss: 0.5272133350372314 ,start position accuracy: 0.0 ,end position accuracy: 0.0 ,classifier accuracy: 0.5
+
+12-Jan-21 14:21:33 - saving weights for step 70000 to /home/ubuntu/answering_nq/weights/train_for_hard_mining/epoch_0 folder
+12-Jan-21 16:04:08 - epoch: 0,training info: ,start position loss: 0.14103074371814728 ,end position loss: 0.018482722342014313 ,classification loss: 0.025086211040616035 ,start position accuracy: 1.0 ,end position accuracy: 1.0 ,classifier accuracy: 1.0
+100%|███████████████████████████████████████████████████████████████████████████████████████████| 76043/76043 [21:15:32<00:00,  1.01s/it]
+100%|███████████████████████████████████████████████████████████████████████████████████████████| 76043/76043 [21:15:33<00:00,  1.01s/it]
+12-Jan-21 16:04:10 - epoch: 0,training info average values: ,start position loss: 1.5396299329468 ,end position loss: 1.45355196826454 ,classification loss: 0.5036894776294707 ,start position accuracy: 0.5776564894752557 ,end position accuracy: 0.5994834264494107 ,classifier accuracy: 0.7963323382822877
+12-Jan-21 16:04:10 - saving weights after epoch 0 to /home/ubuntu/answering_nq/weights/train_for_hard_mining/epoch_0 folder
+ 50%|██████████████████████████████████████████████▌                                              | 1/2 [21:15:34<21:15:34, 76534.02s/it]12-Jan-21 16:04:11 - training for epoch 1
+12-Jan-21 16:04:11 - training for epoch 1
+12-Jan-21 16:04:11 - Number of batches: 76043
+                                                                                                                                         12-Jan-21 16:04:12 - epoch: 1,training info: ,start position loss: 0.018016498535871506 ,end position loss: 0.04633389040827751 ,classification loss: 0.04535743594169617 ,start position accuracy: 1.0 ,end position accuracy: 1.0 ,classifier accuracy: 1.0
+
+12-Jan-21 16:04:12 - saving weights for step 0 to /home/ubuntu/answering_nq/weights/train_for_hard_mining/epoch_1 folder                  11%|█████████▌                                                                                | 8100/76043 [2:14:27<18:47:47,  1.00it/s]
+ 50%|██████████████████████████████████████████████▌                                              | 1/2 [23:29:59<23:29:59, 84599.21s/it]
