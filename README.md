@@ -34,20 +34,24 @@ Thus, the next step would be to sample a hard negative candidate from a distribu
 #### How to run:
 1. **Clone** the repository  
   ```git clone https://github.com/gunjanpatil/answering_natural_questions.git```
+  
 2. **Setup**: To download, unzip and install all necessary packages,run setup.sh.
-  ```bash setup.sh```
+    ```bash setup.sh```
+    
 3. **Training**:
   a. To train a model with train_v1.py, first modify training configurations in configs/args.json file according to your requirements.
-    Mandatory modifications required are:
+      Mandatory modifications required are:
       - *datasets_path*: path to the natural_questions_simplified folder where the simplifed datasets jsonl file will be stored after running setup.sh
       - *project_path*: path to your repository
     You can make changes to other arguments in the args file depending on your needs. You can also train using mixed precision by setting the fp16 argument to true.
+    
   b. To launch distributed training of a model using version 1, run the training script train_v1.py with a config file located in configs/args.json as follows:
     ```bash
     cd src
     python3 -m torch.distributed.launch --nproc_per_node=2 train_v1.py --configs=configs/args.json > train_v1_logs.txt
     ```
     The training configs used for this project are the same as the ones in configs/args.json. The weights are saved in the output_dir mentioned in the configs file.
+    
 4. **Validation**:
   a. To run validate using a mdel trained in version 1, run validate_v1.py to generate predictions on the validation dataset as follows:
     ```bash
