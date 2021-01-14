@@ -41,7 +41,7 @@ Thus, the next step would be to sample a hard negative candidate from a distribu
   
 2. **Setup**: 
     
-    To download, unzip and install all necessary packages,run setup.sh.
+    To download, unzip and install all necessary packages,run setup.sh. This takes around 4-5 minutes, might vary depending on the network's downloading speed.
     ```bash setup.sh```
     
 3. **Training**
