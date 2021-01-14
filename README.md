@@ -45,7 +45,7 @@ Thus, the next step would be to sample a hard negative candidate from a distribu
     
     To download, unzip and install all necessary packages,run setup.sh. This takes around 4-5 minutes, might vary depending on the network's downloading speed.
     ```. setup.sh```
-    After this setup, you will be in the src directory of this repository. 
+    After this setup, you will be in the src directory of this repository.
     
 3. **Training**
     1. To train a model with train_v1.py, first modify training configurations in configs/args.json file according to your requirements.
@@ -56,7 +56,6 @@ Thus, the next step would be to sample a hard negative candidate from a distribu
       
     2. To launch training of a model using version 1, run the training script train_v1.py with a config file located in configs/args.json as follows:    
         ```bash
-        cd src
         python3 -m torch.distributed.launch --nproc_per_node=<number_of_gpus_in_system> train_v1.py --configs=configs/args.json > train_v1_logs.txt
         ```
         Set nproc_per_node value to the number of GPUs in your system. This command also works with one GPU. The training configs used for this project are the same as the ones in configs/args.json. The model was trained on 2 RTX-6000 GPUs. The weights are saved in the output_dir mentioned in the configs file. 
