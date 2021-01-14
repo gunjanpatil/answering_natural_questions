@@ -159,7 +159,7 @@ class Collator(object):
 
             # get positive example using the positive candidate
             positive_answer_tokens, positive_start_index, positive_end_index = \
-                self._get_positive_answer_tokens(data, question_tokens, answer_tokens_length)
+                self._get_positive_answer_tokens(data, len(question_tokens), answer_tokens_length)
             positive_input_tokens = ['[CLS]'] + question_tokens + ['[SEP]'] + positive_answer_tokens + ['[SEP]']
             positive_input_ids = self.tokenizer.convert_tokens_to_ids(positive_input_tokens)
             batch_input_ids[i * 2, :len(positive_input_ids)] = positive_input_ids
