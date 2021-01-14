@@ -10,6 +10,6 @@ mkdir natural_questions_simplified
 cd natural_questions_simplified
 gsutil -m cp -R gs://natural_questions/v1.0-simp* .
 cd v1.0-simplified/
-gzip -d simplified-nq-train.jsonl.gz
-gzip -d nq-dev-all.jsonl.gz
+gzip -vkd simplified-nq-train.jsonl.gz
+gzip -vkd nq-dev-all.jsonl.gz
 cd ../../../src/
