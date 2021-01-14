@@ -14,7 +14,6 @@ import jsonlines
 
 import numpy as np
 from tqdm import tqdm
-from apex import amp
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
@@ -45,7 +44,7 @@ def parse_data_from_json_file(val_dataset: str, max_data: int = 1e10):
         data_dict (dict):
     """
     # check if input file is of type jsonl
-    assert os.path.splitext(val_dataset)[-1] == ".json", "dataset file type is not jsonl, check the file provided"
+    assert os.path.splitext(val_dataset)[-1] == ".jsonl", "dataset file type is not jsonl, check the file provided"
     # store all document ids
     id_list = []
     # store all candidates
@@ -97,11 +96,11 @@ if __name__=='__main__':
     parser.add_argument('-m', '--model_path', help='path to a saved model', type=str, default='bert-base-uncased')
     parser.add_argument('-w', '--weights', help='path to saved weights for the model', type=str,
                         default='../weights/bert-base-uncased/epoch1/')
-    parser.add_argument('--fp16', action='store_false', help='mention if loaded model is trained on half precision')
+    parser.add_argument('--fp16', action='store_true', help='mention if loaded model is trained on half precision')
     args = parser.parse_args()
 
     logging.info("parsing validation dataset")
-    id_list, id_candidate_list_sorted, data_dict = parse_data_from_json_file(args.val_dataset)
+    id_list, id_candidate_list_sorted, data_dict = parse_data_from_json_file(args.val_dataset, 10)
 
     # hyperparameters
     max_seq_length = 384
@@ -117,7 +116,9 @@ if __name__=='__main__':
 
     if torch.cuda.is_available():
         model.cuda()
+    logging.info(f"fp16: {args.fp16}")
     if args.fp16:
+        from apex import amp
         model = amp.initialize(model, opt_level="O1", verbosity=0)
     if torch.cuda.device_count() > 1:
         model = torch.nn.DataParallel(model)
