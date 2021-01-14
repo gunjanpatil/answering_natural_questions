@@ -11,13 +11,16 @@ The broad idea is to finetune pre-trained hugging face transformer-based questio
 #### Version 1: Uniform sampling
 - **Idea**: The model is trained using examples with a positive long-answer candidate and a uniformly sampled negative long-answer candidate from the positive examples. The idea is to make the model learn which candidates are correct predictions and which candidates are incorrect.
 - **Model finetuned**: bert-base-uncased
-- **long-best-threshold-f1**: 0.46
+- **Scores**:
+  1. long-best-threshold-f1: 0.4608
+  2. long-best-threshold-precision: 0.4157
+  3. long-best-threshold-recall: 0.5169
 
 #### Version 2: Better sampling
 - **Idea**: The reason behind a low f1 score would be that the negative long-answer candidate sampled might not be the most challenging candidate against the positive candidate.
 Thus, the next step would be to sample a hard negative candidate from a distribution that tells us the probability of hardness of each candidate. To get this distribution, we can use the model trained in version 0 that gives us the probability score of a positive candidate to mine hard negative examples.
 - **Model to be finetuned**: deepset/bert-large-uncased-whole-word-masking-squad2
-- **long-best-threshold-f1**: pending
+- **Scores**: pending
 
 ---
 *System Requirements:*
