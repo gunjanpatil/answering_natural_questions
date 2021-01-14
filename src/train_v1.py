@@ -145,7 +145,7 @@ def main():
         os.makedirs(out_dir, exist_ok=True)
 
     # parsing training dataset file to generate training examples
-    dataset_train_file = os.path.join(data_args.datasets_path, data_args.simplified_train_dataset)
+    dataset_train_file = os.path.join(data_args.project_path, data_args.datasets_path, data_args.simplified_train_dataset)
     id_list, data_dict = parse_data_from_json_file(dataset_train_file)
 
     if args.local_rank not in [-1, 0]:
