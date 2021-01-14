@@ -74,3 +74,4 @@ Thus, the next step would be to sample a hard negative candidate from a distribu
         All the scores will be written in the scores_predictions.txt file. *The scores for the bert-base-uncased model trained in version 1 is stored under predictions/bert-base-uncased/*
     
     
+
