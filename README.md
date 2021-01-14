@@ -41,34 +41,31 @@ Thus, the next step would be to sample a hard negative candidate from a distribu
     ```bash setup.sh```
     
 3. **Training**
+    1. To train a model with train_v1.py, first modify training configurations in configs/args.json file according to your requirements.
     
-    a. To train a model with train_v1.py, first modify training configurations in configs/args.json file according to your requirements.
-      Mandatory modifications required are:
+        Mandatory modifications required are:      
+          - *datasets_path*: path to the natural_questions_simplified folder where the simplifed datasets jsonl file will be stored after running setup.sh
+          - *project_path*: path to your repository
+        You can make changes to other arguments in the args file depending on your needs. You can also train using mixed precision by setting the fp16 argument to true.
       
-        - *datasets_path*: path to the natural_questions_simplified folder where the simplifed datasets jsonl file will be stored after running setup.sh
-        - *project_path*: path to your repository
-      You can make changes to other arguments in the args file depending on your needs. You can also train using mixed precision by setting the fp16 argument to true.
+    2. To launch distributed training of a model using version 1, run the training script train_v1.py with a config file located in configs/args.json as follows:    
+        ```bash
+        cd src
+        python3 -m torch.distributed.launch --nproc_per_node=2 train_v1.py --configs=configs/args.json > train_v1_logs.txt
+        ```
+        The training configs used for this project are the same as the ones in configs/args.json. The weights are saved in the output_dir mentioned in the configs file.
+    
+4. **Validation**:  
+    1. To run validate using a mdel trained in version 1, run validate_v1.py to generate predictions on the validation dataset as follows:
+        ```bash
+        python3 validate_v1.py -d=<path_to_v1.0-simplified_nq-dev-all.jsonl_file> -o=<path_to_directory_to_store_predictions_file -m=<model_name_or_path> -w=<path_to_saved_model_weights>
+        ```
+        You can also add a --fp16 argument further if your model was trained in mixed precision. On running the validation script, a predictions.json file will be generated in the output path given during execution of the script.
       
-    b. To launch distributed training of a model using version 1, run the training script train_v1.py with a config file located in configs/args.json as follows:
-    
-      ```bash
-      cd src
-      python3 -m torch.distributed.launch --nproc_per_node=2 train_v1.py --configs=configs/args.json > train_v1_logs.txt
-      ```
-      The training configs used for this project are the same as the ones in configs/args.json. The weights are saved in the output_dir mentioned in the configs file.
-    
-4. **Validation**:
-    
-    a. To run validate using a mdel trained in version 1, run validate_v1.py to generate predictions on the validation dataset as follows:
-      ```bash
-      python3 validate_v1.py -d=<path_to_v1.0-simplified_nq-dev-all.jsonl_file> -o=<path_to_directory_to_store_predictions_file -m=<model_name_or_path> -w=<path_to_saved_model_weights>
-      ```
-      You can also add a --fp16 argument further if your model was trained in mixed precision. On running the validation script, a predictions.json file will be generated in the output path given during execution of the script.
-      
-    b. Then, finally run google's evaluation script to generate f1 scores.
-      ```bash
-      python3 nq_eval.py --gold_path=<path_to_predictions.json_file> > scores_predictions.txt
-      ```
-      All the scores will be written in the predictions.txt file. *The scores for the bert-base-uncased model trained in version 1 is stored under predictions/bert-base-uncased/*
+    2. Then, finally run google's evaluation script to generate f1 scores.
+        ```bash
+        python3 nq_eval.py --gold_path=<path_to_predictions.json_file> > scores_predictions.txt
+        ```
+        All the scores will be written in the predictions.txt file. *The scores for the bert-base-uncased model trained in version 1 is stored under predictions/bert-base-uncased/*
     
     
