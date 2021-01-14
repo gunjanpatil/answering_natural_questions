@@ -1,6 +1,6 @@
 {
   "model_name_or_path": "bert-base-uncased",
-  "datasets_path": "/home/ubuntu/datasets/natural_questions_simplified",
+  "datasets_path": "datasets/natural_questions_simplified",
   "project_path": "/home/ubuntu/answering_natural_questions",
   "simplified_train_dataset": "v1.0-simplified/simplified-nq-train.jsonl",
   "simplified_val_dataset": "v1.0-simplified/nq-dev-all.jsonl",
@@ -13,6 +13,6 @@
   "fp16": false,
   "fp16_opt_level": "O1",
   "overwrite_output_dir": true,
-  "output_dir": "weights/train_v1",
+  "output_dir": "weights/train_v1/bert-base-uncased",
   "seed": 42
 }
