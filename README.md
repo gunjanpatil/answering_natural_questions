@@ -25,8 +25,7 @@ Thus, the next step would be to sample a hard negative candidate from a distribu
 ---
 *System Requirements:*
 1. Works with Python3
-2. Distributed system(multiple GPUs) for training (Used lambda stack gpu cloud's 2x RTX 6000(24 GB) instance).
-3. Validation will work on a CUDA installed machine.
+2. Trains and validates with a single GPU or a distributed system(multiple GPUs) - (Used lambda stack gpu cloud's 2x RTX 6000(24 GB) instance for this project)
 
 *Major Packages Required*
 1. [transformers~=4.1.1](https://github.com/huggingface/transformers, "huggingface transformers github")
@@ -36,40 +35,43 @@ Thus, the next step would be to sample a hard negative candidate from a distribu
 ---
 
 #### Installation and Run:
-1. **Clone** the repository  
-  ```git clone https://github.com/gunjanpatil/answering_natural_questions.git```
+1. **Clone** the repository 
+    ```bash
+    git clone https://github.com/gunjanpatil/answering_natural_questions.git
+    cd answering_natural_questions
+    ```
   
 2. **Setup**: 
     
     To download, unzip and install all necessary packages,run setup.sh. This takes around 4-5 minutes, might vary depending on the network's downloading speed.
-    ```bash setup.sh```
+    ```. setup.sh```
+    After this setup, you will be in the src directory of this repository. 
     
 3. **Training**
     1. To train a model with train_v1.py, first modify training configurations in configs/args.json file according to your requirements.
     
-        Mandatory modifications required are:      
-          - *datasets_path*: path to the natural_questions_simplified folder where the simplifed datasets jsonl file will be stored after running setup.sh
+        Mandatory modifications required:
           - *project_path*: path to your repository
         You can make changes to other arguments in the args file depending on your needs. You can also train using mixed precision by setting the fp16 argument to true.
       
-    2. To launch distributed training of a model using version 1, run the training script train_v1.py with a config file located in configs/args.json as follows:    
+    2. To launch training of a model using version 1, run the training script train_v1.py with a config file located in configs/args.json as follows:    
         ```bash
         cd src
-        python3 -m torch.distributed.launch --nproc_per_node=2 train_v1.py --configs=configs/args.json > train_v1_logs.txt
+        python3 -m torch.distributed.launch --nproc_per_node=<number_of_gpus_in_system> train_v1.py --configs=configs/args.json > train_v1_logs.txt
         ```
-        The training configs used for this project are the same as the ones in configs/args.json. The weights are saved in the output_dir mentioned in the configs file.
+        Set nproc_per_node value to the number of GPUs in your system. This command also works with one GPU. The training configs used for this project are the same as the ones in configs/args.json. The model was trained on 2 RTX-6000 GPUs. The weights are saved in the output_dir mentioned in the configs file. 
     
-4. **Validation**:  
+4. **Validation**:
     1. To run validate using a mdel trained in version 1, run validate_v1.py to generate predictions on the validation dataset as follows:
         ```bash
-        python3 validate_v1.py -d=<path_to_v1.0-simplified_nq-dev-all.jsonl_file> -o=<path_to_directory_to_store_predictions_file -m=<model_name_or_path> -w=<path_to_saved_model_weights>
+        python3 validate_v1.py -d=../datasets/natural_questions_simplified/v1.0-simplified/nq-dev-all.jsonl -o=<path_to_directory_to_store_predictions_file -m=<model_name_or_path> -w=<path_to_saved_model_weights>
         ```
         You can also add a --fp16 argument further if your model was trained in mixed precision. On running the validation script, a predictions.json file will be generated in the output path given during execution of the script.
       
     2. Then, finally run google's evaluation script to generate f1 scores.
         ```bash
-        python3 nq_eval.py --gold_path=<path_to_predictions.json_file> > scores_predictions.txt
+        python3 nq_eval.py --gold_path=../datasets/natural_questions_simplified/v1.0-simplified/nq-dev-all.jsonl.gz --predictions_path=<path_to_predictions.json_file > scores_predictions.txt
         ```
-        All the scores will be written in the predictions.txt file. *The scores for the bert-base-uncased model trained in version 1 is stored under predictions/bert-base-uncased/*
+        All the scores will be written in the scores_predictions.txt file. *The scores for the bert-base-uncased model trained in version 1 is stored under predictions/bert-base-uncased/*
     
     
