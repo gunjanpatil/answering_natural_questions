@@ -125,9 +125,9 @@ class Collator(object):
             batch_attention_mask (Tensor(batch_size, self.max_seq_len)): mask for token ids which are not 0
             batch_token_type_ids (Tensor(batch_size, self.max_seq_len)): label for type of token ids whether question
                 or answer
-            batch_y_start (Tensor(batch_size)): starting positions for positive and negative candidates
-            batch_y_end (Tensor(batch_size)): end positions for positive and negative candidate
-            batch_y (Tensor(batch_size)): class labels for positive and negative candidate
+            batch_start_indices (Tensor(batch_size)): starting positions for positive and negative candidates
+            batch_end_indices (Tensor(batch_size)): end positions for positive and negative candidate
+            batch_class_labels (Tensor(batch_size)): class labels for positive and negative candidate
         """
         # to store input for both positive and negative candidate
         batch_size = 2 * len(batch_ids)
@@ -174,8 +174,8 @@ class Collator(object):
             # get negative example from negative candidate
             negative_answer_tokens, negative_start_index, negative_end_index = \
                 self._get_negative_answer_tokens(data, answer_tokens_length)
-            negatve_input_tokens = ['[CLS]'] + question_tokens + ['[SEP]'] + negative_answer_tokens + ['[SEP]']
-            negative_input_ids = self.tokenizer.convert_tokens_to_ids(negatve_input_tokens)
+            negative_input_tokens = ['[CLS]'] + question_tokens + ['[SEP]'] + negative_answer_tokens + ['[SEP]']
+            negative_input_ids = self.tokenizer.convert_tokens_to_ids(negative_input_tokens)
             batch_token_type_ids[i * 2 + 1, :len(negative_input_ids)] = [0 if k <= negative_input_ids.index(102) else 1
                                                                          for k in range(len(negative_input_ids))]
             batch_input_ids[i * 2 + 1, :len(negative_input_ids)] = negative_input_ids
@@ -183,7 +183,7 @@ class Collator(object):
             batch_end_indices[i * 2 + 1] = negative_end_index
 
             # freeing memory
-            del negative_answer_tokens, negatve_input_tokens, negative_input_ids
+            del negative_answer_tokens, negative_input_tokens, negative_input_ids
 
         batch_attention_mask = batch_input_ids > 0
 
@@ -275,3 +275,163 @@ class CollatorForValidation(Collator):
 
         return torch.from_numpy(batch_input_ids), torch.from_numpy(batch_attention_mask), torch.from_numpy(
             batch_token_type_ids)
+
+
+class CollatorV2(Collator):
+    """Custom collator for simplified training dataset and hard mined examples"""
+
+    def __init__(self, id_list, neg_id_list, data_dict, neg_data_dict, new_token_dict, tokenizer, max_seq_length=384,
+                 max_question_length=64):
+        super().__init__(data_dict, tokenizer, max_seq_length, max_question_length)
+        self.id_list = id_list
+        self.neg_id_list = neg_id_list
+        self.neg_data_dict = neg_data_dict
+        self.new_token_dict = new_token_dict
+
+    def _get_all_tokens(self, candidate_words, answer_tokens_length):
+        """ returns words to token indices and candidate tokens
+
+        Tokenize words and return the required number of tokens and
+        the list of cumulative sum of number of tokens for each word at an index
+
+        Args:
+            candidate_words (List[str]): list of candidate words
+            answer_tokens_length (int): max number of tokens that the answer should contain
+
+        Returns:
+            words_to_tokens_index (List[int]): list of token indices for words
+            candidate_tokens (List[str]): list of desired number of tokens (max length = max_answer_tokens)
+        """
+        for i, word in enumerate(candidate_words):
+            if re.match(r'<.+>', word):
+                if word in self.new_token_dict:
+                    candidate_words[i] = self.new_token_dict[word]
+                else:
+                    candidate_words[i] = '<'
+        # list of token indices for words
+        words_to_tokens_index = []
+        # list of all tokens, max length of the list will be equal to max_answer_tokens
+        candidate_tokens = []
+        for i, word in enumerate(candidate_words):
+            words_to_tokens_index.append(len(candidate_tokens))
+            # ignore html tags
+            if re.match(r'<.+>', word):
+                continue
+            tokens = self.tokenizer.tokenize(word)
+            if len(candidate_tokens) + len(tokens) > answer_tokens_length:
+                break
+            candidate_tokens.extend(tokens)
+        return words_to_tokens_index, candidate_tokens
+
+    def __call__(self, batch_ids):
+        """call for generating a batch of inputs
+
+        Args:
+            batch_ids (List[int]): list of example ids
+
+        Returns:
+            batch_input_ids (Tensor(batch_size, self.max_seq_len)): token ids for positive candidate words and
+                negative candidate words
+            batch_attention_mask (Tensor(batch_size, self.max_seq_len)): mask for token ids which are not 0
+            batch_token_type_ids (Tensor(batch_size, self.max_seq_len)): label for type of token ids whether question
+                or answer
+            batch_start_indices (Tensor(batch_size)): starting positions for positive and negative candidates
+            batch_end_indices (Tensor(batch_size)): end positions for positive and negative candidate
+            batch_class_labels (Tensor(batch_size)): class labels for positive and negative candidate
+        """
+        # defining batch size value
+        negative_examples_count = 2
+        batch_size = 2 * len(batch_ids) + negative_examples_count  # two negative sample per batch
+
+        # initializing batch inputs
+        batch_input_ids = np.zeros((batch_size, self.max_seq_length), dtype=np.int64)
+        batch_token_type_ids = np.ones((batch_size, self.max_seq_length), dtype=np.int64)
+        batch_start_indices = np.zeros((batch_size,), dtype=np.int64)
+        batch_end_indices = np.zeros((batch_size,), dtype=np.int64)
+        batch_class_labels = np.zeros((batch_size,), dtype=np.int64)
+
+        for i, pos_id in enumerate(batch_ids):
+            document_id = self.id_list[pos_id]
+            data = self.data_dict[document_id]
+
+            # get label
+            annotations = data.annotation[0]
+            if annotations['yes_no_answer'] == 'YES':
+                batch_class_labels[i * 2] = 4
+            elif annotations['yes_no_answer'] == 'NO':
+                batch_class_labels[i * 2] = 3
+            elif annotations['short_answers']:
+                batch_class_labels[i * 2] = 2
+            elif annotations['long_answer']['candidate_index'] != -1:
+                batch_class_labels[i * 2] = 1
+            batch_class_labels[i * 2 + 1] = 0
+
+            question_tokens = self.tokenizer.tokenize(data.question_text)[:self.max_question_len]
+            answer_tokens_length = self.max_seq_length - len(question_tokens) - 3
+
+            # get positive example using the positive candidate
+            positive_answer_tokens, positive_start_index, positive_end_index = \
+                self._get_positive_answer_tokens(data, len(question_tokens), answer_tokens_length)
+            positive_input_tokens = ['[CLS]'] + question_tokens + ['[SEP]'] + positive_answer_tokens + ['[SEP]']
+            positive_input_ids = self.tokenizer.convert_tokens_to_ids(positive_input_tokens)
+            batch_input_ids[i * 2, :len(positive_input_ids)] = positive_input_ids
+            batch_token_type_ids[i * 2, :len(positive_input_ids)] = [0 if k <= positive_input_ids.index(102) else 1
+                                                                     for k in range(len(positive_input_ids))]
+            if annotations['short_answers']:
+                if positive_start_index < 0 or positive_end_index < 0:  # if the groundtruth span not in the truncated data,
+                    # ignore this positive data by setting labels to -1
+                    batch_start_indices[i * 2] = -1
+                    batch_end_indices[i * 2] = -1
+                    batch_class_labels[i * 2] = -1
+                else:
+                    batch_start_indices[i * 2] = positive_start_index
+                    batch_end_indices[i * 2] = positive_end_index
+            else:
+                batch_start_indices[i * 2] = positive_start_index
+                batch_end_indices[i * 2] = positive_end_index
+
+            # freeing memory
+            del positive_answer_tokens, positive_input_tokens, positive_input_ids
+
+            # get negative example from negative candidate
+            negative_answer_tokens, negative_start_index, negative_end_index = \
+                self._get_negative_answer_tokens(data, answer_tokens_length)
+            negative_input_tokens = ['[CLS]'] + question_tokens + ['[SEP]'] + negative_answer_tokens + ['[SEP]']
+            negative_input_ids = self.tokenizer.convert_tokens_to_ids(negative_input_tokens)
+            batch_token_type_ids[i * 2 + 1, :len(negative_input_ids)] = [0 if k <= negative_input_ids.index(102) else 1
+                                                                         for k in range(len(negative_input_ids))]
+            batch_input_ids[i * 2 + 1, :len(negative_input_ids)] = negative_input_ids
+            batch_start_indices[i * 2 + 1] = negative_start_index
+            batch_end_indices[i * 2 + 1] = negative_end_index
+
+            # freeing memory
+            del negative_answer_tokens, negative_input_tokens, negative_input_ids
+
+        for i, neg_id in enumerate(batch_ids[:negative_examples_count]):
+            id = i + 2 * len(batch_ids)
+            if id >= batch_size:
+                break
+            document_id = self.neg_id_list[neg_id]
+            data = self.neg_data_dict[document_id]
+
+            question_tokens = self.tokenizer.tokenize(data.question_text)[:self.max_question_len]
+            answer_tokens_length = self.max_seq_length - len(question_tokens) - 3
+            # get negative example from negative candidate
+            negative_answer_tokens, negative_start_index, negative_end_index = \
+                self._get_negative_answer_tokens(data, answer_tokens_length)
+            negative_input_tokens = ['[CLS]'] + question_tokens + ['[SEP]'] + negative_answer_tokens + ['[SEP]']
+            negative_input_ids = self.tokenizer.convert_tokens_to_ids(negative_input_tokens)
+            batch_token_type_ids[i * 2 + 1, :len(negative_input_ids)] = [0 if k <= negative_input_ids.index(102) else 1
+                                                                         for k in range(len(negative_input_ids))]
+            batch_input_ids[i * 2 + 1, :len(negative_input_ids)] = negative_input_ids
+            batch_start_indices[i * 2 + 1] = negative_start_index
+            batch_end_indices[i * 2 + 1] = negative_end_index
+
+            # freeing memory
+            del negative_answer_tokens, negative_input_tokens, negative_input_ids
+
+        batch_attention_mask = batch_input_ids > 0
+
+        return torch.from_numpy(batch_input_ids), torch.from_numpy(batch_attention_mask), torch.from_numpy(
+            batch_token_type_ids), torch.LongTensor(batch_start_indices), torch.LongTensor(batch_end_indices), torch.LongTensor(
+            batch_class_labels)
