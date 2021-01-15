@@ -87,17 +87,7 @@ def parse_data_from_json_file(val_dataset: str, max_data: int = 1e10):
     return id_list, id_candidate_list_sorted, data_dict
 
 
-if __name__=='__main__':
-    parser = argparse.ArgumentParser(description="parser to mine hard examples from a set of examples")
-    parser.add_argument('-d', '--val_dataset', help='path to dataset examples json file', type=str,
-                        default='../datasets/natural_questions_simplified/v1.0-simplified_nq-dev-all.jsonl')
-    parser.add_argument('-o', '--output_path', help='path to store predictions', type=str,
-                        default='../predictions/bert_base_uncased/')
-    parser.add_argument('-m', '--model_path', help='path to a saved model', type=str, default='bert-base-uncased')
-    parser.add_argument('-w', '--weights', help='path to saved weights for the model', type=str,
-                        default='../weights/bert-base-uncased/epoch1/')
-    parser.add_argument('--fp16', action='store_true', help='mention if loaded model is trained on half precision')
-    args = parser.parse_args()
+def main(args):
 
     logging.info("parsing validation dataset")
     id_list, id_candidate_list_sorted, data_dict = parse_data_from_json_file(args.val_dataset)
@@ -119,7 +109,7 @@ if __name__=='__main__':
     logging.info(f"fp16: {args.fp16}")
     if args.fp16:
         from apex import amp
-        model = amp.initialize(model, opt_level="O1", verbosity=0)
+        model = amp.initialize(model, opt_level="args.fp16_opt_level", verbosity=0)
     if torch.cuda.device_count() > 1:
         model = torch.nn.DataParallel(model)
 
@@ -200,3 +190,17 @@ if __name__=='__main__':
     # write to json file
     with open(os.path.join(args.output_path, 'predictions.json'), 'w') as f:
         json.dump(final_dict, f)
+
+if __name__ == '__main__':
+    # Arguments parser
+    parser = argparse.ArgumentParser(description="parser to mine hard examples from a set of examples")
+    parser.add_argument('-d', '--val_dataset', help='path to dataset examples json file', type=str,
+                        default='../datasets/natural_questions_simplified/v1.0-simplified_nq-dev-all.jsonl')
+    parser.add_argument('-o', '--output_path', help='path to store predictions', type=str,
+                        default='../predictions/bert_base_uncased/')
+    parser.add_argument('-m', '--model_path', help='path to a saved model', type=str, default='bert-base-uncased')
+    parser.add_argument('-w', '--weights', help='path to saved weights for the model', type=str,
+                        default='../weights/bert-base-uncased/epoch1/')
+    parser.add_argument('--fp16', action='store_true', help='mention if loaded model is trained on half precision')
+    parser.add_argument('--fp16_opt_level', default='O1', type=str, help='mention the opt level for mixed precision')
+    args = parser.parse_args()

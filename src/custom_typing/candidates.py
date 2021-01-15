@@ -98,13 +98,14 @@ class AugmentedExampleSimplified:
                 end_idx=neg_candidate['end_token']
             )
 
+
 class AugmentedNegativeExampleSimplified:
     """
     Class to create augmented negative example containing only negative long answer candidate for simplified train
     dataset
     """
 
-    def __init__(self, example: dict, negative_candidate_index: int=None):
+    def __init__(self, example: dict, negative_candidate_index: Optional[int]=None):
         """
         Takes in a single training example and converts it into a new augmented type example containing negative long
         answer candidate
@@ -115,7 +116,7 @@ class AugmentedNegativeExampleSimplified:
             example_idx : index of the example
             question_text: text of question
             annotation: full annotation for the example
-            negative_candidate: randomly sampled wrong annotation from long answer candidates
+            negative_candidate: sampled wrong annotation from long answer candidates
 
         Args:
             example (dict): single example for simplified natural questions dataset
@@ -127,4 +128,10 @@ class AugmentedNegativeExampleSimplified:
 
         document_words = example['document_text'].split()
 
-
+        if negative_candidate_index:
+            neg_candidate = example['long_answer_candidates'][negative_candidate_index]
+            self.negative_candidate = NegativeCandidate(
+                words=document_words[neg_candidate['start_token']:neg_candidate['end_token']],
+                start_idx=neg_candidate['start_token'],
+                end_idx=neg_candidate['end_token']
+            )
