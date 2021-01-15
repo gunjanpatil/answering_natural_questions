@@ -89,6 +89,7 @@ def parse_data_from_json_file(val_dataset: str, max_data: int = 1e10):
 
 def main(args):
 
+    logging.info("parsing validation dataset")
     id_list, id_candidate_list_sorted, data_dict = parse_data_from_json_file(args.val_dataset)
 
     # hyperparameters
@@ -201,7 +202,5 @@ if __name__ == '__main__':
     parser.add_argument('-w', '--weights', help='path to saved weights for the model', type=str,
                         default='../weights/bert-base-uncased/epoch1/')
     parser.add_argument('--fp16', action='store_true', help='mention if loaded model is trained on half precision')
-    parser.add_argument('--fp16_opt_level', default='O1', type=int, help='mention the opt level for mixed precision')
+    parser.add_argument('--fp16_opt_level', default='O1', type=str, help='mention the opt level for mixed precision')
     args = parser.parse_args()
-
-    logging.info("parsing validation dataset")
