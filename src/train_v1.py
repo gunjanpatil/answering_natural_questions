@@ -37,7 +37,7 @@ from transformers import BertTokenizer, BertConfig, HfArgumentParser, TrainingAr
 
 from models.bert.bert_for_qa import BertForQuestionAnswering
 from custom_typing.arguments import ModelArguments, DataTrainingArguments
-from custom_typing.candidates import AugmentedExampleSimplified
+from custom_typing.candidates import AugmentedExampleSimplified, sample_index
 from custom_typing.datasets import SimplifiedNaturalQADataset
 from utils.collator import Collator
 from utils.metrics import MovingAverage, compute_loss, compute_accuracy
@@ -87,9 +87,15 @@ def parse_data_from_json_file(train_dataset: str, max_data: int = 1e10, shuffle:
 
             # create an example only if it is a positive example and contains negative long answer candidates
             if is_positive and len(data_line['long_answer_candidates']) > 1:
-                long_answer_candidate = AugmentedExampleSimplified(example=data_line)
-                data_dict[long_answer_candidate.example_idx] = long_answer_candidate
-                id_list.append(long_answer_candidate.example_idx)
+                # sample negative candidate uniformly
+                distribution = np.ones((len(data_line['long_answer_candidates']),), dtype=np.float32)
+                distribution[annotations['long_answer']['candidate_index']] = 0.0
+                distribution /= len(distribution)
+                neg_candidate_index = sample_index(distribution)
+
+                augmented_example = AugmentedExampleSimplified(data_line, neg_candidate_index)
+                data_dict[augmented_example.example_idx] = augmented_example
+                id_list.append(augmented_example.example_idx)
 
     if shuffle:
         random.shuffle(id_list)
@@ -100,6 +106,9 @@ def parse_data_from_json_file(train_dataset: str, max_data: int = 1e10, shuffle:
 def main(args):
     """
     main function that loads data, model, tokenizer, config and trains the model
+
+    Args:
+        args : command line arguments
     """
 
     logging.info(f"local rank: {args.local_rank}")
@@ -137,7 +146,7 @@ def main(args):
 
     # parsing training dataset file to generate training examples
     dataset_train_file = os.path.join(data_args.project_path, data_args.datasets_path, data_args.simplified_train_dataset)
-    id_list, data_dict = parse_data_from_json_file(dataset_train_file)
+    id_list, data_dict = parse_data_from_json_file(dataset_train_file, 20)
 
     if args.local_rank not in [-1, 0]:
         # blocking all processes expect base process 0
