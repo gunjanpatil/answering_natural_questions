@@ -58,7 +58,7 @@ class AugmentedExampleSimplified:
     """Class to create an augmented positive example containing positive long answer candidate and
     negative long answer candidate for simplified train dataset"""
 
-    def __init__(self, example: dict):
+    def __init__(self, example: dict, negative_candidate_index: Optional[int]=None):
         """
         Takes in a single positive example and converts it into a new augmented type example
 
@@ -72,7 +72,8 @@ class AugmentedExampleSimplified:
             negative_candidate: randomly sampled wrong annotation from long answer candidates
 
         Args:
-            example: single example for simplified natural questions dataset
+            example (dict): single example for simplified natural questions dataset
+            negative_candidate_index (int): negative long answer candidate index
         """
 
         self.example_idx = example['example_id']
@@ -88,16 +89,11 @@ class AugmentedExampleSimplified:
             end_idx=pos_candidate['end_token']
         )
 
-        # sample negative candidate uniformly
-        distribution = np.ones((len(example['long_answer_candidates']),), dtype=np.float32)
-        distribution[example['annotations'][0]['long_answer']['candidate_index']] = 0.0
-        distribution /= len(distribution)
-        negative_candidate_index = sample_index(distribution)
+        if negative_candidate_index:
+            neg_candidate = example['long_answer_candidates'][negative_candidate_index]
 
-        neg_candidate = example['long_answer_candidates'][negative_candidate_index]
-
-        self.negative_candidate = NegativeCandidate(
-            words=document_words[neg_candidate['start_token']:neg_candidate['end_token']],
-            start_idx=neg_candidate['start_token'],
-            end_idx=neg_candidate['end_token']
-        )
+            self.negative_candidate = NegativeCandidate(
+                words=document_words[neg_candidate['start_token']:neg_candidate['end_token']],
+                start_idx=neg_candidate['start_token'],
+                end_idx=neg_candidate['end_token']
+            )
