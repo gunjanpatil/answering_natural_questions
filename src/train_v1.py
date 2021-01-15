@@ -2,7 +2,7 @@
 - Script for distributed training of hugging face transformer models with google's simplified version of natural
   questions
 - Restricted to hardware containing multiple GPUs
-- Allows for multiprecision(fp16) training. To allow it, set fp16 flag in configs/args.json to true
+- Allows for mixed precision(fp16) training. To allow it, set fp16 flag in configs/args.json to true
 
 Parsing through the simplified training dataset examples:
     Use positive examples to generate positive and negative examples.
@@ -97,25 +97,17 @@ def parse_data_from_json_file(train_dataset: str, max_data: int = 1e10, shuffle:
     return id_list, data_dict
 
 
-def main():
+def main(args):
+    """
+    main function that loads data, model, tokenizer, config and trains the model
+    """
 
-    # checking for system requirements
-    assert torch.cuda.is_available(), "system does not have gpus to train"
-
-    # Command line argument parser
-    parser = argparse.ArgumentParser(description="arguments that can only be provided using command line")
-    parser.add_argument("-r", "--local_rank", type=int, help="local gpu id provided by the torch distributed launch "
-                                                             "module from command line")
-    parser.add_argument("-c", "--configs", type=str, help="path to configs json file")
-    args = parser.parse_args()
     logging.info(f"local rank: {args.local_rank}")
 
     # Initializing hugging face parser to parse values from json file
     hf_parser = HfArgumentParser(
         (ModelArguments, DataTrainingArguments, TrainingArguments)
     )
-    # make sure that the first argument is a json file to configs
-    assert os.path.splitext(args.configs)[-1] == '.json'
     model_args, data_args, training_args = hf_parser.parse_json_file(
         json_file=os.path.abspath(args.configs)
     )
@@ -276,4 +268,17 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    # checking for system requirements
+    assert torch.cuda.is_available(), "system does not have gpus to train"
+
+    # Command line argument parser
+    parser = argparse.ArgumentParser(description="arguments that can only be provided using command line")
+    parser.add_argument("-r", "--local_rank", type=int, help="local gpu id provided by the torch distributed launch "
+                                                             "module from command line")
+    parser.add_argument("-c", "--configs", type=str, help="path to configs json file")
+    args = parser.parse_args()
+
+    # make sure that the configs file is a json file
+    assert os.path.splitext(args.configs)[-1] == '.json'
+
+    main(args)
