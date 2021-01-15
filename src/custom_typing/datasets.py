@@ -11,3 +11,9 @@ class SimplifiedNaturalQADataset(Dataset):
 
     def __getitem__(self, index):
         return self.id_list[index]
+
+
+class SimplifiedNegativeQADataset(SimplifiedNaturalQADataset):
+    def __init__(self, id_list, neg_id_list) -> object:
+        super().__init__(id_list)
+        self.neg_id_list = neg_id_list
