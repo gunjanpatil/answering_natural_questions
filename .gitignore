@@ -1,6 +1,10 @@
 # custom project specific files
+weights
+apex
+datasets
 *.arrow
 *.py.lock
+*.zip
 
 .idea
 
