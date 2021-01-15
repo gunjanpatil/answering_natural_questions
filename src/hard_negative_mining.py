@@ -19,9 +19,9 @@ import torch
 from torch.utils.data import DataLoader
 from transformers import BertTokenizer, BertConfig
 
-from src.custom_typing.datasets import SimplifiedNaturalQADataset
-from src.models.bert.bert_for_qa import BertForQuestionAnswering
-from src.utils.collator import CollatorForValidation
+from custom_typing.datasets import SimplifiedNaturalQADataset
+from models.bert.bert_for_qa import BertForQuestionAnswering
+from utils.collator import CollatorForValidation
 
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S')
 
@@ -57,7 +57,7 @@ def parse_data_from_json_file(train_dataset: str, max_data: int = 1e10):
 
     logging.info("Parsing Training Data examples")
     with jsonlines.open(train_dataset) as reader:
-        for n, data_line in tqdm(reader):
+        for n, data_line in enumerate(tqdm(reader)):
             if n > max_data:
                 break
             document_id = data_line['example_id']
@@ -144,7 +144,7 @@ def main(args):
     model.eval()
     # storing probability that example has an answer
     positive_probs = np.zeros((len(negative_candidates_sorted),), dtype=np.float32)
-    for j, (batch_input_ids, batch_attention_mask, batch_token_type_ids) in tqdm(enumerate(test_generator)):
+    for j, (batch_input_ids, batch_attention_mask, batch_token_type_ids) in enumerate(tqdm(test_generator)):
         with torch.no_grad():
             start = j * batch_size
             end = start + batch_size
@@ -159,17 +159,16 @@ def main(args):
     positive_probs = 1.0 - positive_probs  # storing the positive
 
     # initialize
-    def default_val():
-        return {'candidate_indices': [], 'hardness_score': []}
-
-    distributions_dict = defaultdict(default_val)
+    distributions_dict = {}
+    for doc_id in id_list:
+        distributions_dict[doc_id] = {'candidate_indices': [], 'hardness_score': []}
 
     # from candidates to document
     for i, (document_id, candidate_index) in tqdm(enumerate(negative_candidates_sorted)):
-        distributions_dict[document_id]['candidate_index_list'].append(candidate_index)
+        distributions_dict[document_id]['candidate_indices'].append(candidate_index)
         distributions_dict[document_id]['hardness_score'].append(positive_probs[i])
 
-    with open(args.output_path, 'wb') as f:
+    with open(os.path.join(args.output_path, 'distributions_dict.pickle'), 'wb') as f:
         pickle.dump(distributions_dict, f, protocol=pickle.HIGHEST_PROTOCOL)
 
 
@@ -182,12 +181,15 @@ if __name__ == '__main__':
     parser.add_argument('-d', '--dataset_path', help='path to dataset examples json file', type=str,
                         default='../datasets/simplified/simplified-nq-train.jsonl')
     parser.add_argument('-o', '--output_path', help='path to store hard mined examples', type=str,
-                        default='../outputs/hard_mined_examples/distribution_dict.pickle')
+                        default='../datasets/hard_mined_examples/')
     parser.add_argument('-m', '--model_path', help='path to a saved model', type=str, default='bert-base-uncased')
     parser.add_argument('-w', '--weights', help='path to saved weights for the model', type=str,
                         default='../weights/bert-base-uncased/epoch1/')
     parser.add_argument('--fp16', action='store_true', help='mention if loaded model is trained on half precision')
-    parser.add_argument('--fp16_opt_level', default='O1', type=int, help='mention the opt level for mixed precision')
+    parser.add_argument('--fp16_opt_level', default='O1', type=str, help='mention the opt level for mixed precision')
     args = parser.parse_args()
 
+    # check if output path exists
+    if not os.path.exists(args.output_path):
+        os.makedirs(args.output_path, exist_ok=True)
     main(args)
