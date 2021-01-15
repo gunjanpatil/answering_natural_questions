@@ -1,7 +1,7 @@
 """
 - Script for distributed training of hugging face transformer models with google's simplified version of natural
   questions
-- Restricted to hardware containing multiple GPUs
+- Works with Single GPU as well as Multi-GPU systems
 - Allows for mixed precision(fp16) training. To allow it, set fp16 flag in configs/args.json to true
 
 Parsing through the simplified training dataset examples:
